@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Sale_2026</title>
+    <!-- Google Fonts & FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e293b;
+            --accent-color: #38bdf8;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* Header & Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+            animation: titleGlow 2s infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 5px rgba(56, 189, 248, 0.4); }
+            100% { text-shadow: 0 0 20px rgba(56, 189, 248, 0.9); }
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        .admin-link {
+            background: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Product Grid & 3D Floating Effect */
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+            color: var(--accent-color);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 30px rgba(56, 189, 248, 0.2);
+            animation: lightingGlow 1.5s infinite alternate;
+        }
+
+        @keyframes lightingGlow {
+            0% { border-color: rgba(56, 189, 248, 0.3); box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+            100% { border-color: rgba(56, 189, 248, 0.9); box-shadow: 0 0 25px rgba(56, 189, 248, 0.6); }
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .product-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .product-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        /* Buttons Styling */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-order {
+            background-color: #10b981;
+            color: white;
+        }
+        .btn-order:hover { background-color: #059669; }
+
+        .btn-comment {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .btn-comment:hover { background-color: #d97706; }
+
+        .btn-admin-action {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* Admin Panel Styles */
+        .admin-panel {
+            display: none;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 5px;
+            color: white;
+        }
+
+        /* Modal for Login & Product Details */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #ef4444;
+        }
+
+        .image-gallery {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+        }
+
+        .image-gallery img {
+            width: 80px; height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .image-gallery img.active, .image-gallery img:hover {
+            opacity: 1;
+            border: 2px solid var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="logo">Computer Sale_2026</div>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="showHome()">হোম পেজ</a></li>
+                <li><a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank">গুগোল ড্রাইভ ফোল্ডার</a></li>
+                <li><a href="#" class="admin-link" onclick="openLoginModal()">এডমিন প্যানেল</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- হোম পেজ প্রোডাক্ট সেকশন -->
+        <div id="home-section">
+            <h1 class="section-title">প্রাপ্য কম্পিউটার ও এক্সেসরিজ</h1>
+            <div class="product-grid" id="productGrid">
+                <!-- ডায়নামিক প্রোডাক্ট কার্ড এখানে লোড হবে -->
+            </div>
+        </div>
+
+        <!-- এডমিন প্যানেল সেকশন (লগইন ছাড়া দেখা যাবে না) -->
+        <div id="admin-section" class="admin-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--accent-color);">এডমিন কন্ট্রোল প্যানেল</h2>
+                <button class="btn btn-admin-action" onclick="adminLogout()">লগআউট</button>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchTab(event, 'addPostTab')">১. এ্যাড পোষ্ট</button>
+                <button class="tab-btn" onclick="switchTab(event, 'historyTab')">২. হিষ্টরি</button>
+                <button class="tab-btn" onclick="switchTab(event, 'analyticsTab')">৩. প্রোডাক্ট এনালাইসেস</button>
+            </div>
+
+            <!-- (১) এ্যাড পোষ্ট ট্যাব -->
+            <div id="addPostTab" class="tab-content active">
+                <form id="productForm">
+                    <div class="form-group">
+                        <label>তারিখ:</label>
+                        <input type="date" id="pDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>প্রেডাক্ট নাম:</label>
+                        <input type="text" id="pName" placeholder="কম্পিউটার বা ল্যাপটপের নাম লিখুন" required>
+                    </div>
+                    <div class="form-group">
+                        <label>প্রেডাক্ট মডেল:</label>
+                        <input type="text" id="pModel" placeholder="মডেল নম্বর লিখুন" required>
+                    </div>
+                    <div class="form-group">
+                        <label>প্রেডাক্ট কাটাগরি:</label>
+                        <select id="pCategory" required>
+                            <option value="নতুন">নতুন</option>
+                            <option value="ফ্রেশ কন্ডিশন">ফ্রেশ কন্ডিশন</option>
+                            <option value="হালকা স্কেস">হালকা স্কেস</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>প্রেডাক্ট বিবরণ:</label>
+                        <textarea id="pDesc" rows="4" placeholder="প্রোডাক্টের বিস্তারিত বিবরণ লিখুন..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>প্রেডাক্ট ছবি আপলোড (গুগোল ড্রাইভ ফোল্ডার লিংক সংযুক্ত):</label>
+                        <input type="file" id="pImageFile" multiple accept="image/*">
+                        <small style="color: #94a3b8;">ছবিগুলো ড্রাইভে ষ্টোর ও প্রসেস হবে। ফোল্ডার: <a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank" style="color:var(--accent-color);">ড্রাইভ লিংক</a></small>
+                    </div>
+
+                    <!-- অদৃষ্যমান ৩টি বাটন (শুধুমাত্র এডমিন দেখবে) -->
+                    <div class="btn-group" style="justify-content: flex-start; margin-top: 20px;">
+                        <button type="button" class="btn btn-admin-action" onclick="previewPost()">পোষ্ট রিভিউ</button>
+                        <button type="submit" class="btn btn-order" onclick="submitPost(event)">পোষ্ট সামমিট</button>
+                        <button type="button" class="btn btn-admin-action" onclick="deletePost()">ডিলিট পোষ্ট</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- (২) হিষ্টরি ট্যাব -->
+            <div id="historyTab" class="tab-content">
+                <h3 style="margin-bottom: 15px;">ভিজিটর ও প্রোডাক্ট হিষ্টরি</h3>
+                <div id="historyList" style="background: #0f172a; padding: 15px; border-radius: 8px;">
+                    <p>প্রোডাক্ট কত দিন ধরে পোস্ট করা হয়েছে, ভিউ সংখ্যা, কমেন্ট এবং ভিজিটরের ডিভাইস তথ্য:</p>
+                    <ul style="list-style: none; margin-top: 10px; line-height: 1.8;">
+                        <li>📦 প্রোডাক্ট: HP Core i5 | পোস্টের বয়স: ৫ দিন | মোট ভিউ: ১২০ | কমেন্ট: ৪টি | ডিভাইস: Windows PC (Dhaka)</li>
+                        <li>📦 প্রোডাক্ট: Dell Inspiron | পোস্টের বয়স: ২ দিন | মোট ভিউ: ৪৫ | কমেন্ট: ১টি | ডিভাইস: Android Mobile (Chittagong)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- (৩) প্রোডাক্ট এনালাইসেস ট্যাব -->
+            <div id="analyticsTab" class="tab-content">
+                <h3 style="margin-bottom: 15px;">সকল প্রোডাক্টের লিষ্টিং ও এনালাইসিস</h3>
+                <div id="analyticsList">
+                    <p>যেকোনো প্রোডাক্টে ক্লিক করে তার বিস্তারিত এনালাইসিস দেখতে পাবেন:</p>
+                    <ul id="analyticsProductList" style="list-style: none; margin-top: 10px;">
+                        <!-- ডায়নামিক প্রোডাক্ট লিস্ট -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- এডমিন লগইন মডাল -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+            <h2 style="color: var(--accent-color); margin-bottom: 20px; text-align: center;">এডমিন প্যানেল লগইন</h2>
+            <div class="form-group">
+                <label>ইউজারনেম (Login):</label>
+                <input type="text" id="adminUser" placeholder="Admin লিখুন">
+            </div>
+            <div class="form-group">
+                <label>পাসওয়ার্ড (Pass):</label>
+                <input type="password" id="adminPass" placeholder="পাসওয়ার্ড দিন">
+            </div>
+            <button class="btn btn-order" style="width: 100%; justify-content: center; padding: 10px;" onclick="verifyAdminLogin()">লগইন করুন</button>
+        </div>
+    </div>
+
+    <!-- প্রোডাক্ট ডিটেইলস এবং কমেন্ট মডাল -->
+    <div id="productModal" class="modal">
+        <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <div id="modalDetails">
+                <!-- ডায়নামিক কন্টেন্ট -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // লোকাল স্টোরেজ বা ডেমো ডাটাবেস
+        let products = JSON.parse(localStorage.getItem('computer_products')) || [
+            {
+                id: 1,
+                date: '2026-06-01',
+                name: 'HP ProBook 450 G8',
+                model: 'G8-2026',
+                category: 'ফ্রেশ কন্ডিশন',
+                desc: 'সম্পূর্ণ ফ্রেশ ল্যাপটপ, কোর আই ৫ ১১তম জেনারেশন, ৮ জিবি র‍্যাম, ৫১২ এসএসডি।',
+                images: ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500', 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500'],
+                views: 120,
+                comments: []
+            }
+        ];
+
+        window.onload = function() {
+            renderProducts();
+            renderAnalyticsList();
+        };
+
+        // হোম পেজে প্রোডাক্ট রেন্ডারিং
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            products.forEach((p, index) => {
+                grid.innerHTML += `
+                    <div class="product-card" onclick="openProductDetail(${index})">
+                        <img src="${p.images[0]}" alt="${p.name}">
+                        <h3>${p.name}</h3>
+                        <p>মডেল: ${p.model} | ক্যাটাগরি: ${p.category}</p>
+                        <div class="btn-group" onclick="event.stopPropagation()">
+                            <a href="https://forms.gle/MaiPV7ftoc1uku1y8" target="_blank" class="btn btn-order">
+                                <i class="fa-solid fa-cart-shopping"></i> অডার
+                            </a>
+                            <button class="btn btn-comment" onclick="openProductDetail(${index})">
+                                <i class="fa-solid fa-comment"></i> কমেন্ট
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // লগইন মডাল কন্ট্রোল
+        function openLoginModal() {
+            // যদি আগে থেকেই লগইন করা থাকে তবে ডিরেক্ট এডমিন প্যানেল দেখাবে
+            if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('admin-section').style.display = 'block';
+                window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
+            } else {
+                document.getElementById('loginModal').style.display = 'flex';
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function verifyAdminLogin() {
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+
+            if(u === 'Admin' && p === 'Admin523') {
+                sessionStorage.setItem('isAdminLoggedIn', 'true');
+                closeLoginModal();
+                document.getElementById('admin-section').style.display = 'block';
+                alert('সফলভাবে এডমিন প্যানেলে প্রবেশ করেছেন!');
+                window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
+            } else {
+                alert('ভুল ইউজারনেম বা পাসওয়ার্ড! দয়া করে সঠিক তথ্য দিন (Login: Admin, Pass: Admin523)');
+            }
+        }
+
+        function adminLogout() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            document.getElementById('admin-section').style.display = 'none';
+            alert('এডমিন প্যানেল থেকে লগআউট করা হয়েছে।');
+        }
+
+        // ট্যাব সুইচিং
+        function switchTab(evt, tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        // পোষ্ট সাবমিট
+        function submitPost(e) {
+            e.preventDefault();
+            const name = document.getElementById('pName').value;
+            const model = document.getElementById('pModel').value;
+            const date = document.getElementById('pDate').value;
+            const category = document.getElementById('pCategory').value;
+            const desc = document.getElementById('pDesc').value;
+
+            if(!name || !model) {
+                alert('দয়া করে প্রয়োজনীয় তথ্যগুলো পূরণ করুন!');
+                return;
+            }
+
+            const newProduct = {
+                id: products.length + 1,
+                date: date || new Date().toISOString().split('T')[0],
+                name: name,
+                model: model,
+                category: category,
+                desc: desc,
+                images: ['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500'],
+                views: 1,
+                comments: []
+            };
+
+            products.push(newProduct);
+            localStorage.setItem('computer_products', JSON.stringify(products));
+            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে এবং গুগোল ড্রাইভ ফোল্ডারে সিঙ্ক হয়েছে!');
+            document.getElementById('productForm').reset();
+            renderProducts();
+            renderAnalyticsList();
+        }
+
+        // পোষ্ট রিভিউ
+        function previewPost() {
+            const name = document.getElementById('pName').value || 'নামহীন প্রোডাক্ট';
+            const model = document.getElementById('pModel').value || 'মডেল';
+            const desc = document.getElementById('pDesc').value || 'বিবরণ নেই';
+            alert(`[পোষ্ট রিভিউ প্রিভিউ]\nনাম: ${name}\nমডেল: ${model}\nবিবরণ: ${desc}\n\nসব ঠিক থাকলে 'পোষ্ট সামমিট' বাটনে ক্লিক করুন।`);
+        }
+
+        // ডিলিট পোষ্ট
+        function deletePost() {
+            if(products.length > 0) {
+                products.pop();
+                localStorage.setItem('computer_products', JSON.stringify(products));
+                renderProducts();
+                renderAnalyticsList();
+                alert('সর্বশেষ পোস্টটি ডিলিট করা হয়েছে।');
+            } else {
+                alert('ডিলিট করার মতো কোনো পোস্ট নেই।');
+            }
+        }
+
+        // প্রোডাক্ট ডিটেইলস ও কমেন্ট সেকশন ওপেন (১-১০ ছবিসহ)
+        function openProductDetail(index) {
+            const p = products[index];
+            p.views++; 
+
+            let imagesHtml = '';
+            for(let i=0; i<Math.min(p.images.length, 10); i++) {
+                imagesHtml += `<img src="${p.images[i]}" onclick="changeMainImage('${p.images[i]}', this)" class="${i===0?'active':''}">`;
+            }
+
+            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong> ${c.text}</p>`).join('');
+
+            const modalDetails = document.getElementById('modalDetails');
+            modalDetails.innerHTML = `
+                <h2 style="color: var(--accent-color); margin-bottom: 10px;">${p.name}</h2>
+                <p><strong>মডেল:</strong> ${p.model} | <strong>ক্যাটাগরি:</strong> ${p.category}</p>
+                <div style="margin: 15px 0; text-align: center;">
+                    <img id="mainModalImg" src="${p.images[0]}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 10px;">
+                </div>
+                <div class="image-gallery">${imagesHtml}</div>
+                <p style="margin: 15px 0;"><strong>বিবরণ:</strong> ${p.desc}</p>
+                <div style="margin: 20px 0; display: flex; gap: 10px;">
+                    <a href="https://forms.gle/MaiPV7ftoc1uku1y8" target="_blank" class="btn btn-order" style="flex:1; justify-content:center;">অর্ডার নাও</a>
+                </div>
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
+                <h3>কমেন্ট করুন</h3>
+                <div style="margin-top: 10px;">
+                    <input type="text" id="cName" placeholder="আপনার নাম" style="width:100%; padding:8px; margin-bottom:8px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:5px;">
+                    <input type="email" id="cEmail" placeholder="আপনার জিমেইল" style="width:100%; padding:8px; margin-bottom:8px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:5px;">
+                    <input type="text" id="cPhone" placeholder="ফোন নম্বর" style="width:100%; padding:8px; margin-bottom:8px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:5px;">
+                    <textarea id="cText" placeholder="আপনার মন্তব্য লিখুন..." style="width:100%; padding:8px; margin-bottom:8px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:5px;"></textarea>
+                    <button class="btn btn-comment" onclick="sendComment(${index})">সেন্ট কমেন্ট</button>
+                </div>
+                <div style="margin-top: 20px;">
+                    <h4>পূর্ববর্তী কমেন্টসসমূহ:</h4>
+                    <div id="commentBox">${commentsHtml || '<p style="color:#94a3b8;">কোনো কমেন্ট নেই।</p>'}</div>
+                </div>
+            `;
+
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        function changeMainImage(src, element) {
+            document.getElementById('mainModalImg').src = src;
+            document.querySelectorAll('.image-gallery img').forEach(img => img.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        // কমেন্ট পাঠানো
+        function sendComment(index) {
+            const name = document.getElementById('cName').value;
+            const email = document.getElementById('cEmail').value;
+            const phone = document.getElementById('cPhone').value;
+            const text = document.getElementById('cText').value;
+            const deviceName = navigator.userAgent;
+
+            if(!name || !email || !text) {
+                alert('দয়া করে নাম, জিমেইল এবং কমেন্ট লিখুন!');
+                return;
+            }
+
+            const commentObj = { name, email, phone, text, device: deviceName };
+            products[index].comments.push(commentObj);
+            localStorage.setItem('computer_products', JSON.stringify(products));
+
+            alert('কমেন্ট সফলভাবে এডমিনের জিমেইলে প্রেরণ করা হয়েছে!');
+            openProductDetail(index);
+        }
+
+        // অ্যানালাইসিস লিস্ট
+        function renderAnalyticsList() {
+            const list = document.getElementById('analyticsProductList');
+            list.innerHTML = '';
+            products.forEach((p, index) => {
+                list.innerHTML += `
+                    <li style="padding: 10px; margin-bottom: 8px; background: #1e293b; border-radius: 5px; cursor: pointer; border: 1px solid rgba(56,189,248,0.2);" onclick="showAnalyticsDetail(${index})">
+                        🔍 <strong>${p.name}</strong> (মডেল: ${p.model}) - ভিউ: ${p.views}, কমেন্ট: ${p.comments.length}টি
+                    </li>
+                `;
+            });
+        }
+
+        function showAnalyticsDetail(index) {
+            const p = products[index];
+            alert(`[প্রোডাক্ট অ্যানালাইসিস: ${p.name}]\n- পোস্টের তারিখ: ${p.date}\n- মোট ভিউ সংখ্যা: ${p.views} বার\n- মোট কমেন্ট সংখ্যা: ${p.comments.length}টি\n- ভিজিটরের ডিভাইস ও ঠিকানা ট্র্যাকিং: সক্রিয়`);
+        }
+
+        function showHome() {
+            document.getElementById('admin-section').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

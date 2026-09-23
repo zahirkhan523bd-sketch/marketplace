@@ -31,7 +31,7 @@
             min-height: 100vh;
         }
 
-        /* Header & Navigation */
+        /* Header Section */
         header {
             display: flex;
             justify-content: space-between;
@@ -58,14 +58,15 @@
             100% { text-shadow: 0 0 20px rgba(56, 189, 248, 0.9); }
         }
 
-        nav ul {
-            display: flex;
+        /* Admin Header Navigation (Initially Hidden for Visitors) */
+        #adminNav {
+            display: none;
             list-style: none;
             gap: 20px;
             align-items: center;
         }
 
-        nav a {
+        #adminNav a {
             color: var(--text-color);
             text-decoration: none;
             font-weight: 600;
@@ -73,7 +74,7 @@
             cursor: pointer;
         }
 
-        nav a:hover {
+        #adminNav a:hover {
             color: var(--accent-color);
         }
 
@@ -302,17 +303,18 @@
     <!-- Header Section -->
     <header>
         <div class="logo">Computer Sale_2026</div>
+        <!-- এই মেনু বারটি শুধুমাত্র এডমিন লগইন করার পরেই হেডার বারে দৃশ্যমান হবে -->
         <nav>
-            <ul>
+            <ul id="adminNav">
                 <li><a href="#" onclick="showHome()">হোম পেজ</a></li>
                 <li><a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank">গুগোল ড্রাইভ ফোল্ডার</a></li>
-                <li><a href="#" class="admin-link" onclick="openLoginModal()">এডমিন প্যানেল</a></li>
+                <li><a href="#" class="admin-link" onclick="openAdminPanel()">এডমিন প্যানেল</a></li>
             </ul>
         </nav>
     </header>
 
     <div class="container">
-        <!-- হোম পেজ প্রোডাক্ট সেকশন -->
+        <!-- Visitor Product Section (All posts show here) -->
         <div id="home-section">
             <h1 class="section-title">প্রাপ্য কম্পিউটার ও এক্সেসরিজ</h1>
             <div class="product-grid" id="productGrid">
@@ -320,7 +322,7 @@
             </div>
         </div>
 
-        <!-- এডমিন প্যানেল সেকশন (লগইন ছাড়া দেখা যাবে না) -->
+        <!-- Admin Panel Section (Visible only after successful login) -->
         <div id="admin-section" class="admin-panel">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="color: var(--accent-color);">এডমিন কন্ট্রোল প্যানেল</h2>
@@ -446,7 +448,38 @@
         window.onload = function() {
             renderProducts();
             renderAnalyticsList();
+            checkAdminSession();
+            checkUrlForAdmin();
         };
+
+        // চেক করা হচ্ছে এডমিন আগে থেকেই লগইন করা আছে কি না
+        function checkAdminSession() {
+            if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('adminNav').style.display = 'flex';
+            } else {
+                document.getElementById('adminNav').style.display = 'none';
+            }
+        }
+
+        // URL এ /Admin চেক করার ফাংশন
+        function checkUrlForAdmin() {
+            const path = window.location.pathname;
+            const hash = window.location.hash;
+            
+            if (path.endsWith('/Admin') || path.includes('/Admin') || hash === '#Admin') {
+                if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                    document.getElementById('admin-section').style.display = 'block';
+                    window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
+                } else {
+                    document.getElementById('loginModal').style.display = 'flex';
+                }
+            }
+        }
+
+        function openAdminPanel() {
+            document.getElementById('admin-section').style.display = 'block';
+            window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
+        }
 
         // হোম পেজে প্রোডাক্ট রেন্ডারিং
         function renderProducts() {
@@ -472,19 +505,9 @@
             });
         }
 
-        // লগইন মডাল কন্ট্রোল
-        function openLoginModal() {
-            // যদি আগে থেকেই লগইন করা থাকে তবে ডিরেক্ট এডমিন প্যানেল দেখাবে
-            if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
-                document.getElementById('admin-section').style.display = 'block';
-                window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
-            } else {
-                document.getElementById('loginModal').style.display = 'flex';
-            }
-        }
-
         function closeLoginModal() {
             document.getElementById('loginModal').style.display = 'none';
+            window.location.href = window.location.pathname.replace(/\/Admin$/, '');
         }
 
         function verifyAdminLogin() {
@@ -493,7 +516,8 @@
 
             if(u === 'Admin' && p === 'Admin523') {
                 sessionStorage.setItem('isAdminLoggedIn', 'true');
-                closeLoginModal();
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('adminNav').style.display = 'flex'; // এডমিন মেনু দৃশ্যমান হবে
                 document.getElementById('admin-section').style.display = 'block';
                 alert('সফলভাবে এডমিন প্যানেলে প্রবেশ করেছেন!');
                 window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
@@ -504,8 +528,9 @@
 
         function adminLogout() {
             sessionStorage.removeItem('isAdminLoggedIn');
+            document.getElementById('adminNav').style.display = 'none';
             document.getElementById('admin-section').style.display = 'none';
-            alert('এডমিন প্যানেল থেকে লগআউট করা হয়েছে।');
+            window.location.href = window.location.pathname.replace(/\/Admin$/, '');
         }
 
         // ট্যাব সুইচিং

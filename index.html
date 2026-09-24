@@ -336,9 +336,9 @@
             <button class="login-trigger-btn" onclick="openLoginModalDirect()">Admin Login</button>
             <nav>
                 <ul id="adminNav">
-                    <li><a href="#" onclick="showHome()">হোম পেজ</a></li>
-                    <li><a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank">গুগোল ড্রাইভ ফোল্ডার</a></li>
-                    <li><a href="#" class="admin-link" onclick="openAdminPanel()">এডমিন প্যানেল</a></li>
+                    <li><a href="#" onclick="showHome()">Home page</a></li>
+                    <li><a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank">Google Drive folder</a></li>
+                    <li><a href="#" class="admin-link" onclick="openAdminPanel()">Admin Panel</a></li>
                 </ul>
             </nav>
         </div>
@@ -347,7 +347,7 @@
     <div class="container">
         <!-- Visitor Product Section -->
         <div id="home-section">
-            <h1 class="section-title">প্রাপ্য কম্পিউটার ও এক্সেসরিজ</h1>
+            <h1 class="section-title">Available computers and accessories</h1>
             <div class="product-grid" id="productGrid">
                 <!-- ডায়নামিক প্রোডাক্ট কার্ড এখানে লোড হবে -->
             </div>
@@ -464,22 +464,54 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'computer_sale_2026_master_v6';
+        // সেন্ট্রাল মাস্টার স্টোরেজ কী (যা পাবলিক ও এডমিন উভয় পেজকে সমানভাবে সিঙ্ক করবে)
+        const STORAGE_KEY = 'computer_sale_2026_unified_products_v7';
 
+        // আপনার স্ক্রিনশটে থাকা ৩টি নিখুঁত ডিফল্ট প্রোডাক্ট
         const defaultProducts = [
             {
                 id: 1,
                 date: '2026-06-01',
                 name: 'HP ProBook 450 G8',
                 model: 'G8-2026',
-                price: '৪৫,০০০ টাকা',
-                category: 'ফ্রেশ কন্ডিশন',
+                price: '45,000 Taka',
+                category: 'Fresh Condition',
                 desc: 'সম্পূর্ণ ফ্রেশ ল্যাপটপ, কোর আই ৫ ১১তম জেনারেশন, ৮ জিবি র‍্যাম, ৫১২ এসএসডি।',
                 images: [
                     'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500', 
                     'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500'
                 ],
                 views: 120,
+                comments: []
+            },
+            {
+                id: 2,
+                date: '2026-06-02',
+                name: 'HP EliteBook 845 G8',
+                model: '845 G8',
+                price: '55,000 Taka',
+                category: 'Fresh Condition',
+                desc: 'রাইজেন প্রো প্রসেসর, ১৬ জিবি র‍্যাম, ৫১২ এসএসডি এনভিএমই।',
+                images: [
+                    'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500',
+                    'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500'
+                ],
+                views: 85,
+                comments: []
+            },
+            {
+                id: 3,
+                date: '2026-06-03',
+                name: 'Lenovo ThinkPad T480s',
+                model: 'T480s',
+                price: '38,000 Taka',
+                category: 'Fresh Condition',
+                desc: 'কোর আই ৭ ৮ম জেনারেশন, ১৬ জিবি র‍্যাম, ২৫৬ এসএসডি।',
+                images: [
+                    'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500',
+                    'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500'
+                ],
+                views: 95,
                 comments: []
             }
         ];
@@ -491,7 +523,12 @@
                 return defaultProducts;
             }
             try {
-                return JSON.parse(data);
+                let parsed = JSON.parse(data);
+                if (!Array.isArray(parsed) || parsed.length === 0) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
+                    return defaultProducts;
+                }
+                return parsed;
             } catch (e) {
                 return defaultProducts;
             }
@@ -546,6 +583,7 @@
             window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
         }
 
+        // পাবলিক হোম পেজে সকল প্রোডাক্ট রেন্ডারিং
         function renderProducts() {
             const products = getProducts();
             const grid = document.getElementById('productGrid');
@@ -556,14 +594,14 @@
                     <div class="product-card" onclick="openProductDetail(${index})">
                         <img src="${p.images[0]}" alt="${p.name}">
                         <h3>${p.name}</h3>
-                        <div class="product-price">মূল্য: ${p.price || 'আলোচনা সাপেক্ষে'}</div>
-                        <p>মডেল: ${p.model} | ক্যাটাগরি: ${p.category}</p>
+                        <div class="product-price">Price: ${p.price || 'Negotiable'}</div>
+                        <p>Model: ${p.model} | Category: ${p.category}</p>
                         <div class="btn-group" onclick="event.stopPropagation()">
                             <a href="https://forms.gle/MaiPV7ftoc1uku1y8" target="_blank" class="btn btn-order">
-                                <i class="fa-solid fa-cart-shopping"></i> অর্ডার
+                                <i class="fa-solid fa-cart-shopping"></i> Order
                             </a>
                             <button class="btn btn-comment" onclick="openProductDetail(${index})">
-                                <i class="fa-solid fa-comment"></i> কমেন্ট
+                                <i class="fa-solid fa-comment"></i> Comment
                             </button>
                         </div>
                     </div>
@@ -682,27 +720,27 @@
 
             document.getElementById('modalDetails').innerHTML = `
                 <h2 style="color: var(--accent-color); margin-bottom: 5px;">${p.name}</h2>
-                <div style="color: #10b981; font-size: 20px; font-weight: 700; margin-bottom: 10px;">মূল্য: ${p.price || 'আলোচনা সাপেক্ষে'}</div>
-                <p><strong>মডেল:</strong> ${p.model} | <strong>ক্যাটাগরি:</strong> ${p.category}</p>
+                <div style="color: #10b981; font-size: 20px; font-weight: 700; margin-bottom: 10px;">Price: ${p.price || 'Negotiable'}</div>
+                <p><strong>Model:</strong> ${p.model} | <strong>Category:</strong> ${p.category}</p>
                 <div style="margin: 15px 0; text-align: center;">
                     <img id="mainModalImg" src="${p.images[0]}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 10px;">
                 </div>
                 <div class="image-gallery">${imagesHtml}</div>
-                <p style="margin: 15px 0;"><strong>বিবরণ:</strong> ${p.desc}</p>
+                <p style="margin: 15px 0;"><strong>Description:</strong> ${p.desc}</p>
                 <div style="margin: 20px 0; display: flex; gap: 10px;">
-                    <a href="https://forms.gle/MaiPV7ftoc1uku1y8" target="_blank" class="btn btn-order" style="flex:1; justify-content:center;">অর্ডার নাও</a>
+                    <a href="https://forms.gle/MaiPV7ftoc1uku1y8" target="_blank" class="btn btn-order" style="flex:1; justify-content:center;">Order Now</a>
                 </div>
                 <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
-                <h3>কমেন্ট করুন</h3>
+                <h3>Comment</h3>
                 <div style="margin-top: 10px;">
                     <input type="text" id="cName" placeholder="আপনার নাম" style="width:100%; padding:8px; margin-bottom:8px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:5px;">
                     <input type="email" id="cEmail" placeholder="আপনার জিমেইল" style="width:100%; padding:8px; margin-bottom:8px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:5px;">
                     <input type="text" id="cPhone" placeholder="ফোন নম্বর" style="width:100%; padding:8px; margin-bottom:8px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:5px;">
                     <textarea id="cText" placeholder="আপনার মন্তব্য লিখুন..." style="width:100%; padding:8px; margin-bottom:8px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:5px;"></textarea>
-                    <button class="btn btn-comment" onclick="sendComment(${index})">সেন্ট কমেন্ট</button>
+                    <button class="btn btn-comment" onclick="sendComment(${index})">Send Comment</button>
                 </div>
                 <div style="margin-top: 20px;">
-                    <h4>পূর্ববর্তী কমেন্টসসমূহ:</h4>
+                    <h4>Previous Comments:</h4>
                     <div id="commentBox">${commentsHtml || '<p style="color:#94a3b8;">কোনো কমেন্ট নেই।</p>'}</div>
                 </div>
             `;

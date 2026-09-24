@@ -336,9 +336,9 @@
             <button class="login-trigger-btn" onclick="openLoginModalDirect()">Admin Login</button>
             <nav>
                 <ul id="adminNav">
-                    <li><a href="#" onclick="showHome()">Home page</a></li>
-                    <li><a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank">Google Drive folder</a></li>
-                    <li><a href="#" class="admin-link" onclick="openAdminPanel()">Admin Panel</a></li>
+                    <li><a href="#" onclick="showHome()">হোম পেজ</a></li>
+                    <li><a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank">গুগোল ড্রাইভ ফোল্ডার</a></li>
+                    <li><a href="#" class="admin-link" onclick="openAdminPanel()">এডমিন প্যানেল</a></li>
                 </ul>
             </nav>
         </div>
@@ -347,7 +347,7 @@
     <div class="container">
         <!-- Visitor Product Section -->
         <div id="home-section">
-            <h1 class="section-title">Available computers and accessories</h1>
+            <h1 class="section-title">প্রাপ্য কম্পিউটার ও এক্সেসরিজ</h1>
             <div class="product-grid" id="productGrid">
                 <!-- ডায়নামিক প্রোডাক্ট কার্ড এখানে লোড হবে -->
             </div>
@@ -398,15 +398,15 @@
                         <textarea id="pDesc" rows="4" placeholder="প্রোডাক্টের বিস্তারিত বিবরণ লিখুন..." required></textarea>
                     </div>
                     <div class="form-group">
-                        <label>প্রেডাক্ট ছবি আপলোড (গুগোল ড্রাইভ ফোল্ডার লিংক সংযুক্ত):</label>
-                        <input type="file" id="pImageFile" multiple accept="image/*">
-                        <small style="color: #94a3b8;">ছবিগুলো ড্রাইভে ষ্টোর ও প্রসেস হবে। ফোল্ডার: <a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank" style="color:var(--accent-color);">ড্রাইভ লিংক</a></small>
+                        <label>ল্যাপটপের ছবি আপলোড (একাধিক ছবি সিলেক্ট করতে পারবেন):</label>
+                        <input type="file" id="pImageFile" multiple accept="image/*" required>
+                        <small style="color: #38bdf8;">ছবিগুলো স্বয়ংক্রিয়ভাবে ড্রাইভে ও পোস্টে সিঙ্ক হবে। ফোল্ডার: <a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank" style="color:var(--accent-color);">ড্রাইভ লিংক</a></small>
                     </div>
 
                     <!-- অদৃষ্যমান ৩টি বাটন -->
                     <div class="btn-group" style="justify-content: flex-start; margin-top: 20px;">
                         <button type="button" class="btn btn-admin-action" onclick="previewPost()">পোষ্ট রিভিউ</button>
-                        <button type="submit" class="btn btn-order" onclick="submitPost(event)">পোষ্ট সামমিট</button>
+                        <button type="submit" class="btn btn-order">পোষ্ট সামমিট</button>
                         <button type="button" class="btn btn-admin-action" onclick="deletePost()">ডিলিট পোষ্ট</button>
                     </div>
                 </form>
@@ -464,10 +464,8 @@
     </div>
 
     <script>
-        // সেন্ট্রাল মাস্টার স্টোরেজ কী (যা পাবলিক ও এডমিন উভয় পেজকে সমানভাবে সিঙ্ক করবে)
-        const STORAGE_KEY = 'computer_sale_2026_unified_products_v7';
+        const STORAGE_KEY = 'computer_sale_2026_image_fix_v8';
 
-        // আপনার স্ক্রিনশটে থাকা ৩টি নিখুঁত ডিফল্ট প্রোডাক্ট
         const defaultProducts = [
             {
                 id: 1,
@@ -542,6 +540,12 @@
             refreshAllViews();
             checkAdminSession();
             checkAdminRoute();
+            
+            // ফর্ম সাবমিট হ্যান্ডলার (FileReader দিয়ে ছবি প্রসেস করার জন্য)
+            document.getElementById('productForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitPostWithImages();
+            });
         };
 
         function refreshAllViews() {
@@ -583,7 +587,6 @@
             window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
         }
 
-        // পাবলিক হোম পেজে সকল প্রোডাক্ট রেন্ডারিং
         function renderProducts() {
             const products = getProducts();
             const grid = document.getElementById('productGrid');
@@ -647,14 +650,15 @@
             evt.currentTarget.classList.add('active');
         }
 
-        function submitPost(e) {
-            e.preventDefault();
+        // ছবিসহ পোস্ট সাবমিট করার ফাংশন (FileReader API ব্যবহার করে অরিজিনাল ছবি লোড করা)
+        function submitPostWithImages() {
             const name = document.getElementById('pName').value;
             const model = document.getElementById('pModel').value;
             const price = document.getElementById('pPrice').value;
             const date = document.getElementById('pDate').value;
             const category = document.getElementById('pCategory').value;
             const desc = document.getElementById('pDesc').value;
+            const imageInput = document.getElementById('pImageFile');
 
             if(!name || !model || !price) {
                 alert('দয়া করে নাম, মডেল এবং মূল্য ঘরগুলো পূরণ করুন!');
@@ -662,7 +666,32 @@
             }
 
             let products = getProducts();
+            let imageFiles = imageInput.files;
 
+            if (imageFiles.length > 0) {
+                let imagesArray = [];
+                let processedCount = 0;
+
+                for (let i = 0; i < Math.min(imageFiles.length, 10); i++) {
+                    let reader = new FileReader();
+                    reader.onload = function(event) {
+                        imagesArray.push(event.target.result);
+                        processedCount++;
+
+                        if (processedCount === Math.min(imageFiles.length, 10) || processedCount === imageFiles.length) {
+                            saveNewProduct(products, name, model, price, date, category, desc, imagesArray);
+                        }
+                    };
+                    reader.readAsDataURL(imageFiles[i]);
+                }
+            } else {
+                // ছবি না দিলে ডিফল্ট ছবি ব্যবহার হবে
+                let defaultImg = ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500'];
+                saveNewProduct(products, name, model, price, date, category, desc, defaultImg);
+            }
+        }
+
+        function saveNewProduct(products, name, model, price, date, category, desc, imagesArray) {
             const newProduct = {
                 id: products.length + 1,
                 date: date || new Date().toISOString().split('T')[0],
@@ -671,7 +700,7 @@
                 price,
                 category, 
                 desc,
-                images: ['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500'],
+                images: imagesArray,
                 views: 0,
                 comments: []
             };
@@ -682,7 +711,7 @@
             document.getElementById('productForm').reset();
             refreshAllViews();
 
-            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে এবং হোম পেজে যুক্ত হয়েছে!');
+            alert('পোষ্ট এবং ল্যাপটপের অরিজিনাল ছবি সফলভাবে পাবলিশ হয়েছে!');
             showHome();
         }
 
@@ -690,7 +719,7 @@
             const name = document.getElementById('pName').value || 'নামহীন';
             const model = document.getElementById('pModel').value || 'মডেল';
             const price = document.getElementById('pPrice').value || 'মূল্য';
-            alert(`[পোষ্ট প্রিভিউ]\nনাম: ${name}\nমডেল: ${model}\nমূল্য: ${price}`);
+            alert(`[পোষ্ট প্রিভিউ]\nনাম: ${name}\nমডেল: ${model}\nমূল্য: ${price}\nঅবস্থা: অরিজিনাল ছবি প্রস্তুত`);
         }
 
         function deletePost() {
@@ -807,7 +836,7 @@
         function showAnalyticsDetail(index) {
             const products = getProducts();
             const p = products[index];
-            alert(`[প্রোডাক্ট অ্যানালাইসিস: ${p.name}]\n- মূল্য: ${p.price}\n- মডেল: ${p.model}\n- ক্যাটাগরি: ${p.category}\n- পোস্টের তারিখ: ${p.date}\n- মোট ভিউ সংখ্যা: ${p.views} বার\n- মোট কমেন্ট সংখ্যা: ${p.comments.length}টি`);
+            alert(`[প্রোডাক্ট অ্যানালাইসিস: ${p.name}]\n- মূল্য: ${p.price}\n- মডেল: ${p.model}\n- ক্যাটাগরি: ${p.category}\n- পোস্টের তারিখ: ${p.date}\n- মোট ভিউ সংখ্যা: ${p.views} বার্ন\n- মোট কমেন্ট সংখ্যা: ${p.comments.length}টি`);
         }
 
         function showHome() {

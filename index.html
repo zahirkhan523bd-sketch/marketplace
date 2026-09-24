@@ -429,25 +429,44 @@
     </div>
 
     <script>
-        // সেন্ট্রালাইজড এবং ইউনিক ডাটা কি (Unified Key) ব্যবহার করা হয়েছে যাতে ডুপ্লিকেট বা অমিল না হয়
-        let products = JSON.parse(localStorage.getItem('computer_sale_2026_products'));
+        // সেন্ট্রালাইজড ডাটা স্টোরেজ কী (ফোর্স সিঙ্কের জন্য নতুন ও ইউনিক নাম)
+        const STORAGE_KEY = 'computer_sale_2026_master_products_v3';
 
-        // যদি ডাটা না থাকে অথবা ডাটার ফরম্যাট ঠিক না থাকে তবে ডিফল্ট ১টি নিখুঁত প্রোডাক্ট সেট হবে
-        if (!products || !Array.isArray(products) || products.length === 0) {
-            products = [
-                {
-                    id: 1,
-                    date: '2026-06-01',
-                    name: 'HP ProBook 450 G8',
-                    model: 'G8-2026',
-                    category: 'ফ্রেশ কন্ডিশন',
-                    desc: 'সম্পূর্ণ ফ্রেশ ল্যাপটপ, কোর আই ৫ ১১তম জেনারেশন, ৮ জিবি র‍্যাম, ৫১২ এসএসডি।',
-                    images: ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500', 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500'],
-                    views: 120,
-                    comments: []
-                }
-            ];
-            localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
+        // ডিফল্ট প্রোডাক্ট ডাটাবেস
+        const defaultProducts = [
+            {
+                id: 1,
+                date: '2026-06-01',
+                name: 'HP ProBook 450 G8',
+                model: 'G8-2026',
+                category: 'ফ্রেশ কন্ডিশন',
+                desc: 'সম্পূর্ণ ফ্রেশ ল্যাপটপ, কোর আই ৫ ১১তম জেনারেশন, ৮ জিবি র‍্যাম, ৫১২ এসএসডি।',
+                images: [
+                    'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500', 
+                    'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500'
+                ],
+                views: 120,
+                comments: []
+            }
+        ];
+
+        // ডাটা লোড করার ফাংশন
+        function getProducts() {
+            let data = localStorage.getItem(STORAGE_KEY);
+            if (!data) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
+                return defaultProducts;
+            }
+            try {
+                return JSON.parse(data);
+            } catch (e) {
+                return defaultProducts;
+            }
+        }
+
+        // ডাটা সেভ করার ফাংশন
+        function saveProducts(productsArray) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(productsArray));
         }
 
         window.onload = function() {
@@ -456,7 +475,7 @@
             checkAdminRoute();
         };
 
-        // সব জায়গায় একই সাথে ডাটা রিফ্রেশ ও সিঙ্ক করার ফাংশন
+        // সব জায়গায় ডাটা রিফ্রেশ ও সিঙ্ক করার মূল ফাংশন
         function refreshAllViews() {
             renderProducts();
             renderAnalyticsList();
@@ -493,6 +512,7 @@
 
         // পাবলিক হোম পেজে সকল প্রোডাক্ট রেন্ডারিং
         function renderProducts() {
+            const products = getProducts();
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
             
@@ -565,6 +585,8 @@
                 return;
             }
 
+            let products = getProducts();
+
             const newProduct = {
                 id: products.length + 1,
                 date: date || new Date().toISOString().split('T')[0],
@@ -578,7 +600,7 @@
             };
 
             products.push(newProduct);
-            localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
+            saveProducts(products);
             
             alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে এবং হোম পেজে যুক্ত হয়েছে!');
             document.getElementById('productForm').reset();
@@ -593,9 +615,10 @@
         }
 
         function deletePost() {
+            let products = getProducts();
             if(products.length > 0) {
                 products.pop();
-                localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
+                saveProducts(products);
                 refreshAllViews();
                 alert('সর্বশেষ পোস্টটি ডিলিট করা হয়েছে।');
             } else {
@@ -605,9 +628,10 @@
 
         // প্রোডাক্ট ডিটেইলস ও কমেন্ট মডাল
         function openProductDetail(index) {
+            let products = getProducts();
             const p = products[index];
             p.views++; 
-            localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
+            saveProducts(products);
 
             let imagesHtml = '';
             for(let i=0; i<Math.min(p.images.length, 10); i++) {
@@ -667,9 +691,10 @@
                 return;
             }
 
+            let products = getProducts();
             const commentData = { name, email, phone, text, device: navigator.userAgent };
             products[index].comments.push(commentData);
-            localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
+            saveProducts(products);
 
             alert('কমেন্ট সফলভাবে এডমিনের জিমেইলে প্রেরণ করা হয়েছে!');
             openProductDetail(index);
@@ -678,6 +703,7 @@
 
         // হিষ্টরি ট্যাব রেন্ডার
         function renderHistoryList() {
+            const products = getProducts();
             const historyUl = document.getElementById('historyUl');
             historyUl.innerHTML = '';
             
@@ -690,6 +716,7 @@
 
         // অ্যানালাইসিস ট্যাব রেন্ডার
         function renderAnalyticsList() {
+            const products = getProducts();
             const list = document.getElementById('analyticsProductList');
             list.innerHTML = '';
             products.forEach((p, index) => {
@@ -702,6 +729,7 @@
         }
 
         function showAnalyticsDetail(index) {
+            const products = getProducts();
             const p = products[index];
             alert(`[প্রোডাক্ট অ্যানালাইসিস: ${p.name}]\n- মডেল: ${p.model}\n- ক্যাটাগরি: ${p.category}\n- পোস্টের তারিখ: ${p.date}\n- মোট ভিউ সংখ্যা: ${p.views} বার\n- মোট কমেন্ট সংখ্যা: ${p.comments.length}টি`);
         }

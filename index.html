@@ -51,7 +51,7 @@
             color: var(--accent-color);
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
             animation: titleGlow 2s infinite alternate;
-            cursor: pointer;
+            user-select: none;
         }
 
         @keyframes titleGlow {
@@ -59,7 +59,29 @@
             100% { text-shadow: 0 0 20px rgba(56, 189, 248, 0.9); }
         }
 
-        /* Admin Header Navigation (Initially Hidden for Visitors) */
+        /* Header Nav & Admin Login Direct Button */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .login-trigger-btn {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-trigger-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
         #adminNav {
             display: none;
             list-style: none;
@@ -303,15 +325,18 @@
 
     <!-- Header Section -->
     <header>
-        <!-- লোগোতে ডাবল ক্লিক করলেই এডমিন লগইন পপআপ চলে আসবে -->
-        <div class="logo" ondblclick="openLoginModalDirect()" title="ডাবল ক্লিক করে এডমিন লগইন করুন">Computer Sale_2026</div>
-        <nav>
-            <ul id="adminNav">
-                <li><a href="#" onclick="showHome()">হোম পেজ</a></li>
-                <li><a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank">গুগোল ড্রাইভ ফোল্ডার</a></li>
-                <li><a href="#" class="admin-link" onclick="openAdminPanel()">এডমিন প্যানেল</a></li>
-            </ul>
-        </nav>
+        <div class="logo">Computer Sale_2026</div>
+        <div class="header-right">
+            <!-- সাধারণ ভিজিটরদের জন্য এই বাটনটি ক্লিক করলেই লগইন পপআপ আসবে -->
+            <button class="login-trigger-btn" onclick="openLoginModalDirect()">Admin Login</button>
+            <nav>
+                <ul id="adminNav">
+                    <li><a href="#" onclick="showHome()">হোম পেজ</a></li>
+                    <li><a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank">গুগোল ড্রাইভ ফোল্ডার</a></li>
+                    <li><a href="#" class="admin-link" onclick="openAdminPanel()">এডমিন প্যানেল</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
 
     <div class="container">
@@ -430,7 +455,7 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'computer_sale_2026_master_v4';
+        const STORAGE_KEY = 'computer_sale_2026_master_v5';
 
         const defaultProducts = [
             {
@@ -478,7 +503,6 @@
             renderHistoryList();
         }
 
-        // ইউআরএলে চেক করা বা হ্যাশ ডিটেক্ট করা
         function checkAdminRoute() {
             const hash = window.location.hash.toLowerCase();
             const params = new URLSearchParams(window.location.search);
@@ -496,19 +520,15 @@
         function checkAdminSession() {
             if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
                 document.getElementById('adminNav').style.display = 'flex';
+                document.querySelector('.login-trigger-btn').style.display = 'none'; // লগইন থাকলে বাটনটি হাইড থাকবে
             } else {
                 document.getElementById('adminNav').style.display = 'none';
+                document.querySelector('.login-trigger-btn').style.display = 'block';
             }
         }
 
-        // লোগোতে ডাবল ক্লিক করলে লগইন পপআপ ওপেন করার ফাংশন
         function openLoginModalDirect() {
-            if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
-                document.getElementById('admin-section').style.display = 'block';
-                window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
-            } else {
-                document.getElementById('loginModal').style.display = 'flex';
-            }
+            document.getElementById('loginModal').style.display = 'flex';
         }
 
         function openAdminPanel() {
@@ -526,7 +546,7 @@
                     <div class="product-card" onclick="openProductDetail(${index})">
                         <img src="${p.images[0]}" alt="${p.name}">
                         <h3>${p.name}</h3>
-                        <p>মডেল: ${p.model} \vert{} ক্যাটাগরি: ${p.category}</p>
+                        <p>মডেল: ${p.model} | ক্যাটাগরি: ${p.category}</p>
                         <div class="btn-group" onclick="event.stopPropagation()">
                             <a href="https://forms.gle/MaiPV7ftoc1uku1y8" target="_blank" class="btn btn-order">
                                 <i class="fa-solid fa-cart-shopping"></i> অর্ডার
@@ -554,7 +574,7 @@
             if(u === 'Admin' && p === 'Admin523') {
                 sessionStorage.setItem('isAdminLoggedIn', 'true');
                 document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('adminNav').style.display = 'flex';
+                checkAdminSession();
                 document.getElementById('admin-section').style.display = 'block';
                 alert('সফলভাবে এডমিন প্যানেলে প্রবেশ করেছেন!');
                 window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
@@ -565,7 +585,7 @@
 
         function adminLogout() {
             sessionStorage.removeItem('isAdminLoggedIn');
-            document.getElementById('adminNav').style.display = 'none';
+            checkAdminSession();
             document.getElementById('admin-section').style.display = 'none';
             window.location.hash = '';
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -644,11 +664,11 @@
                 imagesHtml += `<img src="${p.images[i]}" onclick="changeMainImage('${p.images[i]}', this)" class="${i===0?'active':''}">`;
             }
 
-            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong>${c.text} <br><small style="color:#94a3b8;">ফোন: ${c.phone \vert{}\vert{} 'দেয়নি'} \vert{} ডিভাইস: ${c.device}</small></p>`).join('');
+            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong> ${c.text} <br><small style="color:#94a3b8;">ফোন: ${c.phone || 'দেয়নি'} | ডিভাইস: ${c.device}</small></p>`).join('');
 
             document.getElementById('modalDetails').innerHTML = `
                 <h2 style="color: var(--accent-color); margin-bottom: 10px;">${p.name}</h2>
-                <p><strong>মডেল:</strong> ${p.model} \vert{} <strong>ক্যাটাগরি:</strong> ${p.category}</p>
+                <p><strong>মডেল:</strong> ${p.model} | <strong>ক্যাটাগরি:</strong> ${p.category}</p>
                 <div style="margin: 15px 0; text-align: center;">
                     <img id="mainModalImg" src="${p.images[0]}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 10px;">
                 </div>
@@ -686,7 +706,6 @@
         }
 
         function sendComment(index) {
-            const name = document.getElementById('cName`id').value; // safe guard
             const nameInput = document.getElementById('cName').value;
             const email = document.getElementById('cEmail').value;
             const phone = document.getElementById('cPhone').value;

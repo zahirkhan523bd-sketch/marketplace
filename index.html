@@ -400,7 +400,7 @@
                     <div class="form-group">
                         <label>ল্যাপটপের ছবি আপলোড (একাধিক ছবি সিলেক্ট করতে পারবেন):</label>
                         <input type="file" id="pImageFile" multiple accept="image/*" required>
-                        <small style="color: #38bdf8;">ছবিগুলো স্বয়ংক্রিয়ভাবে ড্রাইভে ও পোস্টে সিঙ্ক হবে। ফোল্ডার: <a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank" style="color:var(--accent-color);">ড্রাইভ লিংক</a></small>
+                        <small style="color: #38bdf8;">ছবিগুলো অটো-কম্প্রেস হয়ে ড্রাইভে ও পাবলিক পেজে সিঙ্ক হবে। ফোল্ডার: <a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank" style="color:var(--accent-color);">ড্রাইভ লিংক</a></small>
                     </div>
 
                     <!-- অদৃষ্যমান ৩টি বাটন -->
@@ -464,7 +464,7 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'computer_sale_2026_image_fix_v8';
+        const STORAGE_KEY = 'computer_sale_2026_image_compress_v9';
 
         const defaultProducts = [
             {
@@ -533,7 +533,11 @@
         }
 
         function saveProducts(productsArray) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(productsArray));
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(productsArray));
+            } catch (err) {
+                alert('স্টোরেজ ফুল হয়ে গেছে! দয়া করে কিছু পুরোনো পোস্ট ডিলিট করুন।');
+            }
         }
 
         window.onload = function() {
@@ -541,7 +545,6 @@
             checkAdminSession();
             checkAdminRoute();
             
-            // ফর্ম সাবমিট হ্যান্ডলার (FileReader দিয়ে ছবি প্রসেস করার জন্য)
             document.getElementById('productForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 submitPostWithImages();
@@ -650,7 +653,43 @@
             evt.currentTarget.classList.add('active');
         }
 
-        // ছবিসহ পোস্ট সাবমিট করার ফাংশন (FileReader API ব্যবহার করে অরিজিনাল ছবি লোড করা)
+        // ছবি রিসাইজ ও কম্প্রেস করার ফাংশন (যাতে মেমোরি ফুল না হয় এবং ৫+ পোস্ট সহজে পাবলিশ হয়)
+        function compressImage(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // কম্প্রেসড ডাটা ইউআরএল রিটার্ন করবে (Quality 0.7)
+                    callback(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function submitPostWithImages() {
             const name = document.getElementById('pName').value;
             const model = document.getElementById('pModel').value;
@@ -671,21 +710,19 @@
             if (imageFiles.length > 0) {
                 let imagesArray = [];
                 let processedCount = 0;
+                const totalFiles = Math.min(imageFiles.length, 10);
 
-                for (let i = 0; i < Math.min(imageFiles.length, 10); i++) {
-                    let reader = new FileReader();
-                    reader.onload = function(event) {
-                        imagesArray.push(event.target.result);
+                for (let i = 0; i < totalFiles; i++) {
+                    compressImage(imageFiles[i], function(compressedDataUrl) {
+                        imagesArray.push(compressedDataUrl);
                         processedCount++;
 
-                        if (processedCount === Math.min(imageFiles.length, 10) || processedCount === imageFiles.length) {
+                        if (processedCount === totalFiles) {
                             saveNewProduct(products, name, model, price, date, category, desc, imagesArray);
                         }
-                    };
-                    reader.readAsDataURL(imageFiles[i]);
+                    });
                 }
             } else {
-                // ছবি না দিলে ডিফল্ট ছবি ব্যবহার হবে
                 let defaultImg = ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500'];
                 saveNewProduct(products, name, model, price, date, category, desc, defaultImg);
             }
@@ -711,7 +748,7 @@
             document.getElementById('productForm').reset();
             refreshAllViews();
 
-            alert('পোষ্ট এবং ল্যাপটপের অরিজিনাল ছবি সফলভাবে পাবলিশ হয়েছে!');
+            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে এবং হোম পেজে লাইভ হয়ে গেছে!');
             showHome();
         }
 
@@ -719,7 +756,7 @@
             const name = document.getElementById('pName').value || 'নামহীন';
             const model = document.getElementById('pModel').value || 'মডেল';
             const price = document.getElementById('pPrice').value || 'মূল্য';
-            alert(`[পোষ্ট প্রিভিউ]\nনাম: ${name}\nমডেল: ${model}\nমূল্য: ${price}\nঅবস্থা: অরিজিনাল ছবি প্রস্তুত`);
+            alert(`[পোষ্ট প্রিভিউ]\nনাম: ${name}\nমডেল: ${model}\nমূল্য: ${price}\nঅবস্থা: প্রস্তুত`);
         }
 
         function deletePost() {
@@ -836,7 +873,7 @@
         function showAnalyticsDetail(index) {
             const products = getProducts();
             const p = products[index];
-            alert(`[প্রোডাক্ট অ্যানালাইসিস: ${p.name}]\n- মূল্য: ${p.price}\n- মডেল: ${p.model}\n- ক্যাটাগরি: ${p.category}\n- পোস্টের তারিখ: ${p.date}\n- মোট ভিউ সংখ্যা: ${p.views} বার্ন\n- মোট কমেন্ট সংখ্যা: ${p.comments.length}টি`);
+            alert(`[প্রোডাক্ট অ্যানালাইসিস: ${p.name}]\n- মূল্য: ${p.price}\n- মডেল: ${p.model}\n- ক্যাটাগরি: ${p.category}\n- পোস্টের তারিখ: ${p.date}\n- মোট ভিউ সংখ্যা: ${p.views} বার\n- মোট কমেন্ট সংখ্যা: ${p.comments.length}টি`);
         }
 
         function showHome() {

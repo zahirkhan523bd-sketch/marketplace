@@ -51,6 +51,7 @@
             color: var(--accent-color);
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
             animation: titleGlow 2s infinite alternate;
+            cursor: pointer;
         }
 
         @keyframes titleGlow {
@@ -302,8 +303,8 @@
 
     <!-- Header Section -->
     <header>
-        <div class="logo">Computer Sale_2026</div>
-        <!-- এই মেনু বারটি শুধুমাত্র এডমিন লগইন করার পরেই হেডার বারে দৃশ্যমান হবে -->
+        <!-- লোগোতে ডাবল ক্লিক করলেই এডমিন লগইন পপআপ চলে আসবে -->
+        <div class="logo" ondblclick="openLoginModalDirect()" title="ডাবল ক্লিক করে এডমিন লগইন করুন">Computer Sale_2026</div>
         <nav>
             <ul id="adminNav">
                 <li><a href="#" onclick="showHome()">হোম পেজ</a></li>
@@ -314,7 +315,7 @@
     </header>
 
     <div class="container">
-        <!-- Visitor Product Section (All posts show here) -->
+        <!-- Visitor Product Section -->
         <div id="home-section">
             <h1 class="section-title">প্রাপ্য কম্পিউটার ও এক্সেসরিজ</h1>
             <div class="product-grid" id="productGrid">
@@ -322,7 +323,7 @@
             </div>
         </div>
 
-        <!-- Admin Panel Section (Visible only after successful login) -->
+        <!-- Admin Panel Section -->
         <div id="admin-section" class="admin-panel">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="color: var(--accent-color);">এডমিন কন্ট্রোল প্যানেল</h2>
@@ -368,7 +369,7 @@
                         <small style="color: #94a3b8;">ছবিগুলো ড্রাইভে ষ্টোর ও প্রসেস হবে। ফোল্ডার: <a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank" style="color:var(--accent-color);">ড্রাইভ লিংক</a></small>
                     </div>
 
-                    <!-- অদৃষ্যমান ৩টি বাটন (শুধুমাত্র এডমিন দেখবে) -->
+                    <!-- অদৃষ্যমান ৩টি বাটন -->
                     <div class="btn-group" style="justify-content: flex-start; margin-top: 20px;">
                         <button type="button" class="btn btn-admin-action" onclick="previewPost()">পোষ্ট রিভিউ</button>
                         <button type="submit" class="btn btn-order" onclick="submitPost(event)">পোষ্ট সামমিট</button>
@@ -429,8 +430,7 @@
     </div>
 
     <script>
-        // সেন্ট্রালাইজড লোকালস্টোরেজ কি
-        const STORAGE_KEY = 'computer_sale_2026_final_data';
+        const STORAGE_KEY = 'computer_sale_2026_master_v4';
 
         const defaultProducts = [
             {
@@ -478,11 +478,12 @@
             renderHistoryList();
         }
 
+        // ইউআরএলে চেক করা বা হ্যাশ ডিটেক্ট করা
         function checkAdminRoute() {
-            const hash = window.location.hash;
+            const hash = window.location.hash.toLowerCase();
             const params = new URLSearchParams(window.location.search);
 
-            if (hash === '#Admin' || params.has('admin')) {
+            if (hash === '#admin' || params.has('admin') || params.has('Admin')) {
                 if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
                     document.getElementById('admin-section').style.display = 'block';
                     window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
@@ -500,12 +501,21 @@
             }
         }
 
+        // লোগোতে ডাবল ক্লিক করলে লগইন পপআপ ওপেন করার ফাংশন
+        function openLoginModalDirect() {
+            if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('admin-section').style.display = 'block';
+                window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
+            } else {
+                document.getElementById('loginModal').style.display = 'flex';
+            }
+        }
+
         function openAdminPanel() {
             document.getElementById('admin-section').style.display = 'block';
             window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
         }
 
-        // পাবলিক হোম পেজে সকল প্রোডাক্ট রেন্ডারিং
         function renderProducts() {
             const products = getProducts();
             const grid = document.getElementById('productGrid');
@@ -532,7 +542,9 @@
 
         function closeLoginModal() {
             document.getElementById('loginModal').style.display = 'none';
-            window.location.hash = '';
+            if(window.location.hash) {
+                window.location.hash = '';
+            }
         }
 
         function verifyAdminLogin() {
@@ -547,7 +559,7 @@
                 alert('সফলভাবে এডমিন প্যানেলে প্রবেশ করেছেন!');
                 window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
             } else {
-                alert('ভুল ইউজারনেম বা পাসওয়ার্ড! (Login: Admin, Pass: Admin523)');
+                alert('ভুল ইউজারনেম বা পাসওয়ার্ড! সঠিক তথ্য দিন (Login: Admin, Pass: Admin523)');
             }
         }
 
@@ -566,7 +578,6 @@
             evt.currentTarget.classList.add('active');
         }
 
-        // নতুন প্রোডাক্ট সাবমিট করার পর স্বয়ংক্রিয়ভাবে হোম পেজে স্ক্রোল করবে
         function submitPost(e) {
             e.preventDefault();
             const name = document.getElementById('pName').value;
@@ -600,8 +611,8 @@
             document.getElementById('productForm').reset();
             refreshAllViews();
 
-            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে! হোম পেজে গিয়ে দেখে নিন।');
-            showHome(); // সাবমিট হওয়ার সাথে সাথে হোম পেজে নিয়ে যাবে
+            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে এবং হোম পেজে যুক্ত হয়েছে!');
+            showHome();
         }
 
         function previewPost() {
@@ -675,18 +686,19 @@
         }
 
         function sendComment(index) {
-            const name = document.getElementById('cName').value;
+            const name = document.getElementById('cName`id').value; // safe guard
+            const nameInput = document.getElementById('cName').value;
             const email = document.getElementById('cEmail').value;
             const phone = document.getElementById('cPhone').value;
             const text = document.getElementById('cText').value;
 
-            if(!name || !email || !text) {
+            if(!nameInput || !email || !text) {
                 alert('দয়া করে নাম, জিমেইল এবং কমেন্ট লিখুন!');
                 return;
             }
 
             let products = getProducts();
-            const commentData = { name, email, phone, text, device: navigator.userAgent };
+            const commentData = { name: nameInput, email, phone, text, device: navigator.userAgent };
             products[index].comments.push(commentData);
             saveProducts(products);
 
@@ -702,7 +714,7 @@
             
             products.forEach(p => {
                 historyUl.innerHTML += `
-                    <li>📦 প্রোডাক্ট: ${p.name} \vert{} পোস্টের তারিখ: ${p.date} | মোট ভিউ: ${p.views} \vert{} মোট কমেন্ট: ${p.comments.length}টি</li>
+                    <li>📦 প্রোডাক্ট: ${p.name} | পোস্টের তারিখ: ${p.date} | মোট ভিউ: ${p.views} | মোট কমেন্ট: ${p.comments.length}টি</li>
                 `;
             });
         }
@@ -710,7 +722,7 @@
         function renderAnalyticsList() {
             const products = getProducts();
             const list = document.getElementById('analyticsProductList');
-            list.innerHTML = ``;
+            list.innerHTML = '';
             products.forEach((p, index) => {
                 list.innerHTML += `
                     <li style="padding: 10px; margin-bottom: 8px; background: #1e293b; border-radius: 5px; cursor: pointer; border: 1px solid rgba(56,189,248,0.2);" onclick="showAnalyticsDetail(${index})">

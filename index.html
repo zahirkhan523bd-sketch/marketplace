@@ -303,7 +303,7 @@
     <!-- Header Section -->
     <header>
         <div class="logo">Computer Sale_2026</div>
-        <!-- এডমিন লগইন করার পর এই মেনুগুলো দৃশ্যমান হবে -->
+        <!-- এই মেনু বারটি শুধুমাত্র এডমিন লগইন করার পরেই হেডার বারে দৃশ্যমান হবে -->
         <nav>
             <ul id="adminNav">
                 <li><a href="#" onclick="showHome()">হোম পেজ</a></li>
@@ -314,15 +314,15 @@
     </header>
 
     <div class="container">
-        <!-- Visitor Product Section -->
+        <!-- Visitor Product Section (All posts show here) -->
         <div id="home-section">
             <h1 class="section-title">প্রাপ্য কম্পিউটার ও এক্সেসরিজ</h1>
             <div class="product-grid" id="productGrid">
-                <!-- ডায়নামিক প্রোডাক্ট কার্ড -->
+                <!-- ডায়নামিক প্রোডাক্ট কার্ড এখানে লোড হবে -->
             </div>
         </div>
 
-        <!-- Admin Panel Section -->
+        <!-- Admin Panel Section (Visible only after successful login) -->
         <div id="admin-section" class="admin-panel">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="color: var(--accent-color);">এডমিন কন্ট্রোল প্যানেল</h2>
@@ -365,9 +365,10 @@
                     <div class="form-group">
                         <label>প্রেডাক্ট ছবি আপলোড (গুগোল ড্রাইভ ফোল্ডার লিংক সংযুক্ত):</label>
                         <input type="file" id="pImageFile" multiple accept="image/*">
-                        <small style="color: #94a3b8;">ফোল্ডার: <a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank" style="color:var(--accent-color);">ড্রাইভ লিংক</a></small>
+                        <small style="color: #94a3b8;">ছবিগুলো ড্রাইভে ষ্টোর ও প্রসেস হবে। ফোল্ডার: <a href="https://drive.google.com/drive/u/0/folders/1GqO8rO_Y9cV0XObVf-KCSe6TmvB001qB" target="_blank" style="color:var(--accent-color);">ড্রাইভ লিংক</a></small>
                     </div>
 
+                    <!-- অদৃষ্যমান ৩টি বাটন (শুধুমাত্র এডমিন দেখবে) -->
                     <div class="btn-group" style="justify-content: flex-start; margin-top: 20px;">
                         <button type="button" class="btn btn-admin-action" onclick="previewPost()">পোষ্ট রিভিউ</button>
                         <button type="submit" class="btn btn-order" onclick="submitPost(event)">পোষ্ট সামমিট</button>
@@ -381,8 +382,8 @@
                 <h3 style="margin-bottom: 15px;">ভিজিটর ও প্রোডাক্ট হিষ্টরি</h3>
                 <div id="historyList" style="background: #0f172a; padding: 15px; border-radius: 8px;">
                     <p>প্রোডাক্ট কত দিন ধরে পোস্ট করা হয়েছে, ভিউ সংখ্যা, কমেন্ট এবং ভিজিটরের ডিভাইস তথ্য:</p>
-                    <ul style="list-style: none; margin-top: 10px; line-height: 1.8;">
-                        <li>📦 প্রোডাক্ট: HP Core i5 | পোস্টের বয়স: ৫ দিন | মোট ভিউ: ১২০ | কমেন্ট: ৪টি | ডিভাইস: Windows PC (Dhaka)</li>
+                    <ul id="historyUl" style="list-style: none; margin-top: 10px; line-height: 1.8;">
+                        <!-- ডায়নামিক হিষ্টরি লিস্ট -->
                     </ul>
                 </div>
             </div>
@@ -391,7 +392,10 @@
             <div id="analyticsTab" class="tab-content">
                 <h3 style="margin-bottom: 15px;">সকল প্রোডাক্টের লিষ্টিং ও এনালাইসিস</h3>
                 <div id="analyticsList">
-                    <ul id="analyticsProductList" style="list-style: none; margin-top: 10px;"></ul>
+                    <p>যেকোনো প্রোডাক্টে ক্লিক করে তার বিস্তারিত এনালাইসিস দেখতে পাবেন:</p>
+                    <ul id="analyticsProductList" style="list-style: none; margin-top: 10px;">
+                        <!-- ডায়নামিক প্রোডাক্ট লিস্ট -->
+                    </ul>
                 </div>
             </div>
         </div>
@@ -418,28 +422,37 @@
     <div id="productModal" class="modal">
         <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
             <span class="close-modal" onclick="closeProductModal()">&times;</span>
-            <div id="modalDetails"></div>
+            <div id="modalDetails">
+                <!-- ডায়নামিক কন্টেন্ট -->
+            </div>
         </div>
     </div>
 
     <script>
-        let products = JSON.parse(localStorage.getItem('computer_products')) || [
-            {
-                id: 1,
-                date: '2026-06-01',
-                name: 'HP ProBook 450 G8',
-                model: 'G8-2026',
-                category: 'ফ্রেশ কন্ডিশন',
-                desc: 'সম্পূর্ণ ফ্রেশ ল্যাপটপ, কোর আই ৫ ১১তম জেনারেশন, ৮ জিবি র‍্যাম, ৫১২ এসএসডি।',
-                images: ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500', 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500'],
-                views: 120,
-                comments: []
-            }
-        ];
+        // সেন্ট্রালাইজড প্রোডাক্ট ডাটাবেস (লোকালস্টোরেজ থেকে সিঙ্ক করা)
+        let products = JSON.parse(localStorage.getItem('computer_products'));
+        
+        if (!products || products.length === 0) {
+            products = [
+                {
+                    id: 1,
+                    date: '2026-06-01',
+                    name: 'HP ProBook 450 G8',
+                    model: 'G8-2026',
+                    category: 'ফ্রেশ কন্ডিশন',
+                    desc: 'সম্পূর্ণ ফ্রেশ ল্যাপটপ, কোর আই ৫ ১১তম জেনারেশন, ৮ জিবি র‍্যাম, ৫১২ এসএসডি।',
+                    images: ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500', 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500'],
+                    views: 120,
+                    comments: []
+                }
+            ];
+            localStorage.setItem('computer_products', JSON.stringify(products));
+        }
 
         window.onload = function() {
             renderProducts();
             renderAnalyticsList();
+            renderHistoryList();
             checkAdminSession();
             checkAdminRoute();
         };
@@ -472,6 +485,7 @@
             window.scrollTo({ top: document.getElementById('admin-section').offsetTop, behavior: 'smooth' });
         }
 
+        // পাবলিক হোম পেজে সকল প্রোডাক্ট রেন্ডারিং
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -484,7 +498,7 @@
                         <p>মডেল: ${p.model} | ক্যাটাগরি: ${p.category}</p>
                         <div class="btn-group" onclick="event.stopPropagation()">
                             <a href="https://forms.gle/MaiPV7ftoc1uku1y8" target="_blank" class="btn btn-order">
-                                <i class="fa-solid fa-cart-shopping"></i> অডার
+                                <i class="fa-solid fa-cart-shopping"></i> অর্ডার
                             </a>
                             <button class="btn btn-comment" onclick="openProductDetail(${index})">
                                 <i class="fa-solid fa-comment"></i> কমেন্ট
@@ -521,6 +535,7 @@
             document.getElementById('adminNav').style.display = 'none';
             document.getElementById('admin-section').style.display = 'none';
             window.location.hash = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function switchTab(evt, tabId) {
@@ -530,6 +545,7 @@
             evt.currentTarget.classList.add('active');
         }
 
+        // পোষ্ট সামমিট
         function submitPost(e) {
             e.preventDefault();
             const name = document.getElementById('pName').value;
@@ -546,23 +562,30 @@
             const newProduct = {
                 id: products.length + 1,
                 date: date || new Date().toISOString().split('T')[0],
-                name, model, category, desc,
+                name, 
+                model, 
+                category, 
+                desc,
                 images: ['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500'],
-                views: 1,
+                views: 0,
                 comments: []
             };
 
             products.push(newProduct);
             localStorage.setItem('computer_products', JSON.stringify(products));
-            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে!');
+            
+            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে এবং হোম পেজে যুক্ত হয়েছে!');
             document.getElementById('productForm').reset();
+            
             renderProducts();
             renderAnalyticsList();
+            renderHistoryList();
         }
 
         function previewPost() {
             const name = document.getElementById('pName').value || 'নামহীন';
-            alert(`[পোষ্ট প্রিভিউ]\nনাম: ${name}`);
+            const model = document.getElementById('pModel').value || 'মডেল';
+            alert(`[পোষ্ট প্রিভিউ]\nনাম: ${name}\nমডেল: ${model}`);
         }
 
         function deletePost() {
@@ -571,22 +594,25 @@
                 localStorage.setItem('computer_products', JSON.stringify(products));
                 renderProducts();
                 renderAnalyticsList();
+                renderHistoryList();
                 alert('সর্বশেষ পোস্টটি ডিলিট করা হয়েছে।');
             } else {
                 alert('ডিলিট করার মতো কোনো পোস্ট নেই।');
             }
         }
 
+        // প্রোডাক্ট ডিটেইলস ও কমেন্ট মডাল
         function openProductDetail(index) {
             const p = products[index];
             p.views++; 
+            localStorage.setItem('computer_products', JSON.stringify(products));
 
             let imagesHtml = '';
             for(let i=0; i<Math.min(p.images.length, 10); i++) {
                 imagesHtml += `<img src="${p.images[i]}" onclick="changeMainImage('${p.images[i]}', this)" class="${i===0?'active':''}">`;
             }
 
-            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong> ${c.text}</p>`).join('');
+            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong> ${c.text} <br><small style="color:#94a3b8;">ডিভাইস: ${c.device}</small></p>`).join('');
 
             document.getElementById('modalDetails').innerHTML = `
                 <h2 style="color: var(--accent-color); margin-bottom: 10px;">${p.name}</h2>
@@ -624,11 +650,14 @@
 
         function closeProductModal() {
             document.getElementById('productModal').style.display = 'none';
+            renderProducts(); // কাউন্ট আপডেট করার জন্য
         }
 
+        // কমেন্ট পাঠানো এবং জিমেইলে যাওয়ার সিমুলেশন
         function sendComment(index) {
             const name = document.getElementById('cName').value;
             const email = document.getElementById('cEmail').value;
+            const phone = document.getElementById('cPhone').value;
             const text = document.getElementById('cText').value;
 
             if(!name || !email || !text) {
@@ -636,12 +665,29 @@
                 return;
             }
 
-            products[index].comments.push({ name, email, text, device: navigator.userAgent });
+            const commentData = { name, email, phone, text, device: navigator.userAgent };
+            products[index].comments.push(commentData);
             localStorage.setItem('computer_products', JSON.stringify(products));
+
             alert('কমেন্ট সফলভাবে এডমিনের জিমেইলে প্রেরণ করা হয়েছে!');
             openProductDetail(index);
+            renderHistoryList();
+            renderAnalyticsList();
         }
 
+        // হিষ্টরি ট্যাব রেন্ডার
+        function renderHistoryList() {
+            const historyUl = document.getElementById('historyUl');
+            historyUl.innerHTML = '';
+            
+            products.forEach(p => {
+                historyUl.innerHTML += `
+                    <li>📦 প্রোডাক্ট: ${p.name} | পোস্টের তারিখ: ${p.date} | মোট ভিউ: ${p.views} | মোট কমেন্ট: ${p.comments.length}টি</li>
+                `;
+            });
+        }
+
+        // অ্যানালাইসিস ট্যাব রেন্ডার
         function renderAnalyticsList() {
             const list = document.getElementById('analyticsProductList');
             list.innerHTML = '';
@@ -656,7 +702,7 @@
 
         function showAnalyticsDetail(index) {
             const p = products[index];
-            alert(`[প্রোডাক্ট অ্যানালাইসিস: ${p.name}]\n- পোস্টের তারিখ: ${p.date}\n- মোট ভিউ: ${p.views}\n- কমেন্ট: ${p.comments.length}টি`);
+            alert(`[প্রোডাক্ট অ্যানালাইসিস: ${p.name}]\n- মডেল: ${p.model}\n- ক্যাটাগরি: ${p.category}\n- পোস্টের তারিখ: ${p.date}\n- মোট ভিউ সংখ্যা: ${p.views} বার\n- মোট কমেন্ট সংখ্যা: ${p.comments.length}টি`);
         }
 
         function showHome() {

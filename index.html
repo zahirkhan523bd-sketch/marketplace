@@ -429,10 +429,9 @@
     </div>
 
     <script>
-        // সেন্ট্রালাইজড ডাটা স্টোরেজ কী (ফোর্স সিঙ্কের জন্য নতুন ও ইউনিক নাম)
-        const STORAGE_KEY = 'computer_sale_2026_master_products_v3';
+        // সেন্ট্রালাইজড লোকালস্টোরেজ কি
+        const STORAGE_KEY = 'computer_sale_2026_final_data';
 
-        // ডিফল্ট প্রোডাক্ট ডাটাবেস
         const defaultProducts = [
             {
                 id: 1,
@@ -450,7 +449,6 @@
             }
         ];
 
-        // ডাটা লোড করার ফাংশন
         function getProducts() {
             let data = localStorage.getItem(STORAGE_KEY);
             if (!data) {
@@ -464,7 +462,6 @@
             }
         }
 
-        // ডাটা সেভ করার ফাংশন
         function saveProducts(productsArray) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(productsArray));
         }
@@ -475,14 +472,12 @@
             checkAdminRoute();
         };
 
-        // সব জায়গায় ডাটা রিফ্রেশ ও সিঙ্ক করার মূল ফাংশন
         function refreshAllViews() {
             renderProducts();
             renderAnalyticsList();
             renderHistoryList();
         }
 
-        // GitHub Pages এর জন্য হ্যাশ (#Admin) বা কুয়েরি (?admin) চেক করা
         function checkAdminRoute() {
             const hash = window.location.hash;
             const params = new URLSearchParams(window.location.search);
@@ -521,7 +516,7 @@
                     <div class="product-card" onclick="openProductDetail(${index})">
                         <img src="${p.images[0]}" alt="${p.name}">
                         <h3>${p.name}</h3>
-                        <p>মডেল: ${p.model} | ক্যাটাগরি: ${p.category}</p>
+                        <p>মডেল: ${p.model} \vert{} ক্যাটাগরি: ${p.category}</p>
                         <div class="btn-group" onclick="event.stopPropagation()">
                             <a href="https://forms.gle/MaiPV7ftoc1uku1y8" target="_blank" class="btn btn-order">
                                 <i class="fa-solid fa-cart-shopping"></i> অর্ডার
@@ -571,7 +566,7 @@
             evt.currentTarget.classList.add('active');
         }
 
-        // পোষ্ট সামমিট (নতুন প্রোডাক্ট যুক্ত করা)
+        // নতুন প্রোডাক্ট সাবমিট করার পর স্বয়ংক্রিয়ভাবে হোম পেজে স্ক্রোল করবে
         function submitPost(e) {
             e.preventDefault();
             const name = document.getElementById('pName').value;
@@ -602,10 +597,11 @@
             products.push(newProduct);
             saveProducts(products);
             
-            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে এবং হোম পেজে যুক্ত হয়েছে!');
             document.getElementById('productForm').reset();
-            
             refreshAllViews();
+
+            alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে! হোম পেজে গিয়ে দেখে নিন।');
+            showHome(); // সাবমিট হওয়ার সাথে সাথে হোম পেজে নিয়ে যাবে
         }
 
         function previewPost() {
@@ -626,7 +622,6 @@
             }
         }
 
-        // প্রোডাক্ট ডিটেইলস ও কমেন্ট মডাল
         function openProductDetail(index) {
             let products = getProducts();
             const p = products[index];
@@ -638,11 +633,11 @@
                 imagesHtml += `<img src="${p.images[i]}" onclick="changeMainImage('${p.images[i]}', this)" class="${i===0?'active':''}">`;
             }
 
-            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong> ${c.text} <br><small style="color:#94a3b8;">ফোন: ${c.phone || 'দেয়নি'} | ডিভাইস: ${c.device}</small></p>`).join('');
+            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong>${c.text} <br><small style="color:#94a3b8;">ফোন: ${c.phone \vert{}\vert{} 'দেয়নি'} \vert{} ডিভাইস: ${c.device}</small></p>`).join('');
 
             document.getElementById('modalDetails').innerHTML = `
                 <h2 style="color: var(--accent-color); margin-bottom: 10px;">${p.name}</h2>
-                <p><strong>মডেল:</strong> ${p.model} | <strong>ক্যাটাগরি:</strong> ${p.category}</p>
+                <p><strong>মডেল:</strong> ${p.model} \vert{} <strong>ক্যাটাগরি:</strong> ${p.category}</p>
                 <div style="margin: 15px 0; text-align: center;">
                     <img id="mainModalImg" src="${p.images[0]}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 10px;">
                 </div>
@@ -679,7 +674,6 @@
             refreshAllViews();
         }
 
-        // কমেন্ট পাঠানো এবং জিমেইলে যাওয়ার সিমুলেশন
         function sendComment(index) {
             const name = document.getElementById('cName').value;
             const email = document.getElementById('cEmail').value;
@@ -701,7 +695,6 @@
             refreshAllViews();
         }
 
-        // হিষ্টরি ট্যাব রেন্ডার
         function renderHistoryList() {
             const products = getProducts();
             const historyUl = document.getElementById('historyUl');
@@ -709,16 +702,15 @@
             
             products.forEach(p => {
                 historyUl.innerHTML += `
-                    <li>📦 প্রোডাক্ট: ${p.name} | পোস্টের তারিখ: ${p.date} | মোট ভিউ: ${p.views} | মোট কমেন্ট: ${p.comments.length}টি</li>
+                    <li>📦 প্রোডাক্ট: ${p.name} \vert{} পোস্টের তারিখ: ${p.date} | মোট ভিউ: ${p.views} \vert{} মোট কমেন্ট: ${p.comments.length}টি</li>
                 `;
             });
         }
 
-        // অ্যানালাইসিস ট্যাব রেন্ডার
         function renderAnalyticsList() {
             const products = getProducts();
             const list = document.getElementById('analyticsProductList');
-            list.innerHTML = '';
+            list.innerHTML = ``;
             products.forEach((p, index) => {
                 list.innerHTML += `
                     <li style="padding: 10px; margin-bottom: 8px; background: #1e293b; border-radius: 5px; cursor: pointer; border: 1px solid rgba(56,189,248,0.2);" onclick="showAnalyticsDetail(${index})">

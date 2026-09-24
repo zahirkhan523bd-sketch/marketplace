@@ -429,10 +429,11 @@
     </div>
 
     <script>
-        // সেন্ট্রালাইজড প্রোডাক্ট ডাটাবেস (লোকালস্টোরেজ থেকে সিঙ্ক করা)
-        let products = JSON.parse(localStorage.getItem('computer_products'));
-        
-        if (!products || products.length === 0) {
+        // সেন্ট্রালাইজড এবং ইউনিক ডাটা কি (Unified Key) ব্যবহার করা হয়েছে যাতে ডুপ্লিকেট বা অমিল না হয়
+        let products = JSON.parse(localStorage.getItem('computer_sale_2026_products'));
+
+        // যদি ডাটা না থাকে অথবা ডাটার ফরম্যাট ঠিক না থাকে তবে ডিফল্ট ১টি নিখুঁত প্রোডাক্ট সেট হবে
+        if (!products || !Array.isArray(products) || products.length === 0) {
             products = [
                 {
                     id: 1,
@@ -446,16 +447,21 @@
                     comments: []
                 }
             ];
-            localStorage.setItem('computer_products', JSON.stringify(products));
+            localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
         }
 
         window.onload = function() {
-            renderProducts();
-            renderAnalyticsList();
-            renderHistoryList();
+            refreshAllViews();
             checkAdminSession();
             checkAdminRoute();
         };
+
+        // সব জায়গায় একই সাথে ডাটা রিফ্রেশ ও সিঙ্ক করার ফাংশন
+        function refreshAllViews() {
+            renderProducts();
+            renderAnalyticsList();
+            renderHistoryList();
+        }
 
         // GitHub Pages এর জন্য হ্যাশ (#Admin) বা কুয়েরি (?admin) চেক করা
         function checkAdminRoute() {
@@ -545,7 +551,7 @@
             evt.currentTarget.classList.add('active');
         }
 
-        // পোষ্ট সামমিট
+        // পোষ্ট সামমিট (নতুন প্রোডাক্ট যুক্ত করা)
         function submitPost(e) {
             e.preventDefault();
             const name = document.getElementById('pName').value;
@@ -572,14 +578,12 @@
             };
 
             products.push(newProduct);
-            localStorage.setItem('computer_products', JSON.stringify(products));
+            localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
             
             alert('পোষ্ট সফলভাবে পাবলিশ হয়েছে এবং হোম পেজে যুক্ত হয়েছে!');
             document.getElementById('productForm').reset();
             
-            renderProducts();
-            renderAnalyticsList();
-            renderHistoryList();
+            refreshAllViews();
         }
 
         function previewPost() {
@@ -591,10 +595,8 @@
         function deletePost() {
             if(products.length > 0) {
                 products.pop();
-                localStorage.setItem('computer_products', JSON.stringify(products));
-                renderProducts();
-                renderAnalyticsList();
-                renderHistoryList();
+                localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
+                refreshAllViews();
                 alert('সর্বশেষ পোস্টটি ডিলিট করা হয়েছে।');
             } else {
                 alert('ডিলিট করার মতো কোনো পোস্ট নেই।');
@@ -605,14 +607,14 @@
         function openProductDetail(index) {
             const p = products[index];
             p.views++; 
-            localStorage.setItem('computer_products', JSON.stringify(products));
+            localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
 
             let imagesHtml = '';
             for(let i=0; i<Math.min(p.images.length, 10); i++) {
                 imagesHtml += `<img src="${p.images[i]}" onclick="changeMainImage('${p.images[i]}', this)" class="${i===0?'active':''}">`;
             }
 
-            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong> ${c.text} <br><small style="color:#94a3b8;">ডিভাইস: ${c.device}</small></p>`).join('');
+            let commentsHtml = p.comments.map(c => `<p style="background:rgba(255,255,255,0.05); padding:8px; margin:5px 0; border-radius:5px;"><strong>${c.name} (${c.email}):</strong> ${c.text} <br><small style="color:#94a3b8;">ফোন: ${c.phone || 'দেয়নি'} | ডিভাইস: ${c.device}</small></p>`).join('');
 
             document.getElementById('modalDetails').innerHTML = `
                 <h2 style="color: var(--accent-color); margin-bottom: 10px;">${p.name}</h2>
@@ -650,7 +652,7 @@
 
         function closeProductModal() {
             document.getElementById('productModal').style.display = 'none';
-            renderProducts(); // কাউন্ট আপডেট করার জন্য
+            refreshAllViews();
         }
 
         // কমেন্ট পাঠানো এবং জিমেইলে যাওয়ার সিমুলেশন
@@ -667,12 +669,11 @@
 
             const commentData = { name, email, phone, text, device: navigator.userAgent };
             products[index].comments.push(commentData);
-            localStorage.setItem('computer_products', JSON.stringify(products));
+            localStorage.setItem('computer_sale_2026_products', JSON.stringify(products));
 
             alert('কমেন্ট সফলভাবে এডমিনের জিমেইলে প্রেরণ করা হয়েছে!');
             openProductDetail(index);
-            renderHistoryList();
-            renderAnalyticsList();
+            refreshAllViews();
         }
 
         // হিষ্টরি ট্যাব রেন্ডার
